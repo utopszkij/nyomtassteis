@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geocoding Service</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1Z88sYk5uoljvlVhaLxt_TbS9MKDiDYA&callback=initMap&libraries=&v=weekly"
+      defer
+    ></script>
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%; cursor:pointer;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border-style:solid; border-radius:10px; border-color:red; border-color:red;
+        text-align: center;
+        font-family: "Roboto", "sans-serif"; font-size:22pt;
+        line-height: 30px;
+        padding-left: 10px;
+      }
+      #floating-panel input {font-size:22pt}
+      #floating-panel strong {background-color:orange; padding:5px; border-radius:5px}
+      .icon {height:60px}
+      .iconsTop {position:absolute; top:70px; left:160px; z-index:20; background-color:white;
+      	padding:10px; border-radius:15px; border-style: solid; border-color:red; border-width:2px}
+      .i__consBottom {position:absolute; bottom:20px; left:160px; z-index:20; background-color:white;
+      	padding:10px; border-radius:15px; border-style: solid; border-color:red; border-width:2px}
+      .iconsLeft {position:absolute; top:80px; left:30px; z-index:20; background-color:white;
+      	padding:10px; border-radius:15px; border-style: solid; border-color:red; border-width:2px}
+      .iconsRight {position:absolute; top:80px; right:30px; z-index:20; background-color:white;
+      	padding:10px; border-radius:15px; border-style: solid; border-color:red; border-width:2px}
+    </style>
+    <script>
+      "use strict";
+
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 7,
+          center: {
+            lat: -34.397,  // y  +felfelé
+            lng: 150.644   // x  +jobbra
+          }
+        });
+        const geocoder = new google.maps.Geocoder();
+        document.getElementById("submit").addEventListener("click", () => {
+          geocodeAddress(geocoder, map);
+        });
+
+        //+ FT
+
+        // marker click popup tartalma
+        const contentString =
+          '<div id="content">' +
+          '<div id="siteNotice">' +
+          "</div>" +
+          '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
+          '<div id="bodyContent">' +
+          "<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large " +
+          "sandstone rock formation in the southern part of the " +
+          "Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) " +
+          "south west of the nearest large town, Alice Springs; 450&#160;km " +
+          "(280&#160;mi) by road. Kata Tjuta and Uluru are the two major " +
+          "features of the Uluru - Kata Tjuta National Park. Uluru is " +
+          "sacred to the Pitjantjatjara and Yankunytjatjara, the " +
+          "Aboriginal people of the area. It has many springs, waterholes, " +
+          "rock caves and ancient paintings. Uluru is listed as a World " +
+          "Heritage Site.</p>" +
+          '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+          "https://en.wikipedia.org/w/index.php?title=Uluru</a> " +
+          "(last visited June 22, 2009).</p>" +
+          "</div>" +
+          "</div>";
+        // parker click popup object
+        const infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+        geocoder.geocode(
+          {
+            address: "Kecskemét Hungary"
+          },
+          (results, status) => {
+            if (status === "OK") {
+              map.setCenter(results[0].geometry.location);
+              // marker létrehozása
+              const marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location,
+                icon: "images/flag50.png",
+                title: "Magyar ország"
+              });
+              
+              // click funkció hozáadása a markerhez
+              marker.addListener("click", () => {
+                 infowindow.open(map, marker);
+              });
+            } else {
+              alert(
+                "Geocode was not successful for the following reason: " + status
+              );
+            }
+            
+
+        // map click function
+        map.addListener("click", (event) => {
+             var latLng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+			    geocoder.geocode({'location': latLng}, function(results, status) {
+				    if (status === 'OK') {
+				      if (results[0]) {
+				        console.log(results);
+				        //results: {address_components, ..}
+						  //  address_components:[{long_name, types}, ...]
+						  //       .long_name:  string
+						  //       .types[0]: string
+						  //              'locality' település
+						  //              'administrative_area_level_1' megye
+						  // végig kell nézni a results összes elemét azon belül a taddress_components összes elemét
+						  // változó, hogy hól van a megye és a település adat 						  
+						  					        
+				        var telepules = '';
+				        var megye = '';
+				        var regio = '';
+				        var irsz = '';
+				        for (var i = 0; i < results.length; i++) {
+								var address_components = results[i].address_components;
+				        		for (var j = 0; j < address_components.length; j++) {
+				        			if (address_components[j].types[0] == 'locality') {
+										telepules = address_components[j].long_name;				        			
+				        			}
+				        			if (address_components[j].types[0] == 'administrative_area_level_1') {
+										megye = address_components[j].long_name;				        			
+				        			}
+				        			if (address_components[j].types[0] == 'administrative_area_level_2') {
+										regio = address_components[j].long_name;				        			
+				        			}
+				        			if (address_components[j].types[0] == 'postalcode') {
+										irsz = address_components[j].long_name;				        			
+				        			}
+				        		}
+								  
+				        }
+				        var marker = new google.maps.Marker({
+				          position: latLng,
+				          title: telepules,
+				          map: map
+				        });
+				        // marker click popup object a content lehet html kód is
+				        marker.infowindow = new google.maps.InfoWindow({
+          					content: telepules+' / '+
+          						megye+' / '+regio+' / '+irsz+
+          						' lat='+event.latLng.lat()+' lng='+event.latLng.lng()+'<br />'
+        				  });
+        				  // marker click function
+		              marker.addListener("click", () => {
+      		           marker.infowindow.open(map, marker);
+            		  });
+				      } else {
+				        window.alert('No results found');
+				      }
+				    } else {
+				      window.alert('Geocoder failed due to: (1)' + status);
+				    }
+			    });
+
+        });
+      });
+     } 
+     // -FT
+
+
+      
+
+		// kereső gomb click funkció, kereső string szintaxis:
+		// #### Településnév     - irszám szerinti keresés
+		// Településnév Hungary  - településnév szerinti keresés
+		
+      function geocodeAddress(geocoder, resultsMap) {
+        const address = document.getElementById("address").value;
+        geocoder.geocode(
+          {
+            address: address
+          },
+          (results, status) => {
+            if (status === "OK") {
+              resultsMap.setCenter(results[0].geometry.location);
+              new google.maps.Marker({
+                map: resultsMap,
+                position: results[0].geometry.location
+              });
+            } else {
+              alert(
+                "Geocode was not successful for the following reason: " + status
+              );
+            }
+          }
+        );
+      }
+
+
+
+    </script>
+  </head>
+  <body>
+    <div id="floating-panel">
+      <input id="address" type="textbox" value="Magyarország" />
+      <input id="submit" type="button" value="Keresés" />
+      <strong>50% -ban szabad</strong>
+    </div>
+    <div id="map"></div>
+				<div class="iconsTop">
+					<img src="images/harckocsi.jpg" class="icon">
+					<img src="images/harckocsi.jpg" class="icon">
+					<img src="images/harckocsi.jpg" class="icon">
+					<img src="images/harckocsi.jpg" class="icon">
+					<img src="images/harckocsi.jpg" class="icon">
+					12 fő									
+				</div>
+				<div class="iconsLeft">
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					<img src="images/ejtoernyo.jpg" class="icon"><br />
+					7 fő
+				</div>			
+				<div  class="iconsRight">
+					<img src="images/partizan.jpg" class="icon" /><br />				
+					<img src="images/partizan.jpg" class="icon" /><br />				
+					<img src="images/partizan.jpg" class="icon" /><br />				
+					<img src="images/partizan.jpg" class="icon" /><br />				
+					<img src="images/partizan.jpg" class="icon" /><br />				
+					<img src="images/partizan.jpg" class="icon" /><br />
+					32 fő				
+				</div>			
+				<div class="iconsBottom">
+					<img src="images/gyalogos.jpg" class="icon">
+					<img src="images/gyalogos.jpg" class="icon">
+					<img src="images/gyalogos.jpg" class="icon">
+					<img src="images/gyalogos.jpg" class="icon">
+					<img src="images/gyalogos.jpg" class="icon">
+					23 fő		
+					<div id="regioinfo"></div>							
+				</div>
+		    
+    
+  </body>
+</html>
