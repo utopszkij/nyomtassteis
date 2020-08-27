@@ -23,6 +23,7 @@ class Model {
 }
 
 class View {
+	// jQuery és angulár nélküli változat
 	protected $viewName;
 	protected $controller;
 	function __construct(string $modelName, $controller) {
@@ -34,8 +35,10 @@ class View {
 		  $htmlName = $this->controller->ROOTURL.'/wp-content/plugins/'.AREAMANAGER.'/views/htmls/'.$tmplName.'.html';
 		  $jsName = $this->controller->ROOTURL.'/wp-content/plugins/'.AREAMANAGER.'/js/'.AREAMANAGER.'.js';
         ?>
-        <div ng-app="app" id ="page">
-         	<div ng-controller="ctrl" id="scope" style="display:none">
+        <!-- angulárJs változathoz div ng-app="app "id ="areamanager_page">
+         	<div ng-controller="ctrl" id="areamanager_scope" style="display:none" -->
+        <div id ="areamanager_page">
+         	<div  id="areamanager_scope">
 					<?php         	   
          	   $path = $this->controller->MYPATH.'/views/htmls';
          	   if (file_exists($tmplDir.'/'.$tmplName.'.html')) {
@@ -43,9 +46,6 @@ class View {
          	   } else if (file_exists($tmplDir.'/'.AREAMANAGER.'/'.$tmplName.'.html')) {
 						$path = $tmplDir.'/'.AREAMANAGER;         	   
          	   }	
-         	   
-echo 'include jön '.$path.'/'.$tmplName.'.html<br />';         	   
-         	   
          		include $path.'/'.$tmplName.'.html'; 
          		?>
          	</div>
@@ -53,8 +53,10 @@ echo 'include jön '.$path.'/'.$tmplName.'.html<br />';
         <?php if (file_exists($this->controller->MYPATH.'/js/'.AREAMANAGER.'.js')) : ?>
         		<script src="<?php echo $jsName; ?>"></script>
         <?php endif; ?>
-        <script src="https://code.angularjs.org/1.7.8/angular.js"></script>
+        <!-- angularJs -hez  script src="https://code.angularjs.org/1.7.8/angular.js"></script -->
         <script type="text/javascript">
+              var $scope = {};
+              /* angularJs -hez 
 		        angular.module("app", []).controller("ctrl", function($scope) {
 		        	 // angular page onload
 		          <?php 
@@ -83,6 +85,26 @@ echo 'include jön '.$path.'/'.$tmplName.'.html<br />';
 		        	 	jQuery('#scope').show();
 		        	 });	
  				  });
+ 				  */
+		        <?php 
+		            // paraméterek átadása a js -nek
+						foreach ($this->controller as $fn => $fv) {
+							if (is_string($fv)) {
+								echo '$scope.'.$fn.' = '.JSON_encode($fv).";\n";
+							} else if (is_numeric($fv)) {
+								echo '$scope.'.$fn.' = '.$fv.";\n";
+							} else if (is_bool($fv)) {
+								if ($fv) {
+									echo '$scope.'.$fn.' = true;'.";\n";
+								} else {
+									echo '$scope.'.$fn.' = false;'.";\n";
+								}
+							} else {
+								echo '$scope.'.$fn.' = '.JSON_encode($fv).";\n";
+							}							
+						}		        	 
+		        ?>
+ 				  pageOnLoad(document.getElementById($scope);
       	</script>
 		  <?php		
 	}

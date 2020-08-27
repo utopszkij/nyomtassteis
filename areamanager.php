@@ -13,35 +13,55 @@ define('AREAMANAGER', 'areamanager' );
 define('AREAMANAGER_PLUGINPATH',__DIR__);
 define('AREAMANAGER_PLUGINURL',get_site_url().'index.php/areamanager'); 
 
-/**
-* wordpress inditó page létrehozása. Az ilyen oldalak index.php/name módon elindíthatóak.
-* rendszerint esemény kezelő van hozzájuk kapcsolva ami egy plugin rutint indit.
-* @param string $name
-*/
-function areaManagerCreatePage(string $name) {
-	global $wpdb;
-   $w = $wpdb->get_results('select * from '.$wpdb->prefix.'posts where post_type="page" and post_name="'.$name.'"');
-   if (count($w) == 0) {
-		$PageGuid = site_url() ."/".$name;
-		$my_post  = array( 'post_title'     => '',
-	                   'post_type'      => 'page',
-	                   'post_name'      => $name,
-	                   'post_content'   => '',
-	                   'post_status'    => 'publish',
-	                   'comment_status' => 'closed',
-	                   'ping_status'    => 'closed',
-	                   'post_author'    => 1,
-	                   'menu_order'     => 0,
-	                   'guid'           => $PageGuid );
-	  wp_insert_post( $my_post );
-  }
-}
+class Areamanager {
+	/**
+	* wordpress inditó page létrehozása. Az ilyen oldalak index.php/name módon elindíthatóak.
+	* rendszerint esemény kezelő van hozzájuk kapcsolva ami egy plugin rutint indit.
+	* @param string $name
+	*/
+	public function areaManagerCreatePage(string $name) {
+		global $wpdb;
+	   $w = $wpdb->get_results('select * from '.$wpdb->prefix.'posts where post_type="page" and post_name="'.$name.'"');
+	   if (count($w) == 0) {
+			$PageGuid = site_url() ."/".$name;
+			$my_post  = array( 'post_title'     => $name.' start page',
+		                   'post_type'      => 'page',
+		                   'post_name'      => $name,
+		                   'post_content'   => '',
+		                   'post_status'    => 'publish',
+		                   'comment_status' => 'closed',
+		                   'ping_status'    => 'closed',
+		                   'post_author'    => 1,
+		                   'menu_order'     => 0,
+		                   'guid'           => $PageGuid );
+		  wp_insert_post( $my_post );
+	  }
+	}  
+	  
+	/**
+	* admin panel
+	*/
+	public function adminPanel() {
+		 echo '	
+		 <h1>AREA MANAGER PLUGIN ADMIN panel</h1>
+		   copyrigt info, szerzők, támogatás lehetőség stb.
+			<h2>Itt lesznek magadhatóak a plugin beállításai</h2>
+			<ul>
+				<li>Google API_KEY  (help, hogy kell ilyet beszerezni)</li>
+				<li>Default google map location pl: "Budapest Hungary"(új felvitelnél ez a térkép jelenik meg)</li>
+				<li>Default google map zoom (ajánlott:7)</li>  	
+			</ul>
+		 <br />
+		 ';
+	}
+} // Areamanager class
 
 // init plugin
 function areamanager_plugin_init(){
+	 $areamanager = new Areamanager();
     if( !session_id() )
         session_start();
-    areaManagerCreatePage(AREAMANAGER);  
+    $areamanager->areaManagerCreatePage(AREAMANAGER);  
     load_plugin_textdomain( AREAMANAGER, false, AREAMANAGER.'/languages' );
 }
 add_action('init','areamanager_plugin_init');
@@ -52,17 +72,9 @@ add_action('init','areamanager_plugin_init');
 * ez a plugin admin panelje
 */ 
 function areamanager_admin() {
- ?>	
- <h1>AREA MANAGER PLUGIN ADMIN panel</h1>
-   copyrigt info, szerzők, támogatás lehetőség stb.
-	<h2>Itt lesznek magadhatóak a plugin beállításai</h2>
-	<ul>
-		<li>Google API_KEY  (help, hogy kell ilyet beszerezni)</li>
-		<li>Default google map location pl: "Budapest Hungary"(új felvitelnél ez a térkép jelenik meg)</li>
-		<li>Default google map zoom (ajánlott:7)</li>  	
-	</ul>
- <br />
- <?php
+	$areamanager = new Areamanager();
+	$reamanager;
+	$areamanager->adminPanel();
 }
 
 // létrehozunk egy menüpontot az admin oldalon a Beállítások menüben
@@ -75,26 +87,47 @@ function areamanager_plugin_create_menu() {
 
 // ========================== site ======================================================================
 
-
-add_action( 'the_content', 'areamanager_main');
 /**
+* wordpress default esemény kezelő, minden frontend html megjelenítéskor fut
+* global $post már fel van töltve, de még nem lett megjelenítve. 
+* Amikor index.php/areamanager URL -el jelenítjuk meg a plugin indító oldalát, 
+* akkor jobb lenne ha a title és a content üres lenne.
+* Ugyanakkor az admin oldali oldal kezelőben zavaró ha a titke üres.
+* Ezért az adatbázisban az oldalnak van title adata, de azt nem jelenítjük meg.
+*/
+add_action( 'wp', 'areamanagerClearTitle' );
+function areamanagerClearTitle() {
+	 global $post;
+    if ('page' === get_post_type()) {
+    	if ($post->post_name == AREAMANAGER) {
+			$post->post_title = '';
+			$post->content = '';
+    	}
+    } else {
+			return '';    
+    }
+}
+
+
+/**
+* wordpress esemény kezelő, a content megjelenités után fut le
+* amit ez echo -z az a content szövege után jelenik meg.
 * Ez a plugin front end fő programja
 * az  index.php/areamanager?option=controllername&task=taskName  szerű hivásokat kezeli
 */
+add_action( 'the_content', 'areamanager_main');
 function areamanager_main( $content) {
 
 	global $post;
 	if ($post->post_name != AREAMANAGER) {
 		return $content;	
 	}
-	// saját css és bootstrap betöltés
+	
+	ob_start(); // echo átirányitása memóra pufferbe
+	// saját css és betöltése
 	?>
    <link rel='stylesheet' 
-   	href="<?php echo get_site_url(); ?>/wp-content/plugins/areamanager/css/bootstrap.min.css" />	
-   <link rel='stylesheet' 
    	href="<?php echo get_site_url(); ?>/wp-content/plugins/areamanager/css/areamanager.css" />	
-   <script 
-   	src="<?php echo get_site_url(); ?>/wp-content/plugins/areamanager/js/bootstrap.min.js"></script>
 	<?php
 	
 	// bejelentkezett user elérése
@@ -107,7 +140,7 @@ function areamanager_main( $content) {
 	    $user_id = $current_user->ID;
 	 }
 	 
-	 // c és t GET/POST paraméter kezelése
+	 // option és task GET/POST paraméter kezelése
 	 if (isset($_POST['option'])) {
 		$_GET['option'] = $_POST['option'];	 
 	 }
@@ -119,7 +152,7 @@ function areamanager_main( $content) {
 		$option = $_GET['option'];
 	 }	
 	 
-	 
+	 // controller betöltése, aktivizálása
 	 if (file_exists(AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php')) {
 			include_once(AREAMANAGER_PLUGINPATH.'/fw.php');
 			include_once(AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php');
@@ -134,7 +167,9 @@ function areamanager_main( $content) {
 	 } else {
 			echo 'controller not found '.AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php'; exit();	 
 	 }
-	 return '';
+	 $result = ob_get_contents(); // echo -zott tartalom kinyerése a $result változóba
+	 ob_end_clean();
+	 return $result;
 }
 
 // esemény kezelő after product save, ez fut lomtárba helyezés után is, lomtárból végleges törlésnél viszont nem.

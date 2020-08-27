@@ -53,7 +53,7 @@ GNU/GPL
 ## Szerző
 
 Fogler Tibor
-tibor.fogler&gmail.com
+tibor.fogler@gmail.com
 https://github.com/utopszkij
 
 Sas Tibor
