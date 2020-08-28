@@ -1,19 +1,20 @@
 <?php
 // szükség van AREAMANAGER, AREAMANAGER_PLUGINPATH, AREAMANAGER_PLUGINURL konstansra
 
+/**
+ * adatmodel root class, minde modell ennek leszármazottja
+ * @author utopszkij
+*/
 class Model {
 	protected $modelName;
 	protected $controller;
 	protected $db;
-	/*
-	$array = $db->get_results('sql')
-	$db->query('sql')
-	$db->prepare('sql %d  %s  ',ada1,adat1,...)
-	$i = $db->inserted_id
-	$s = $db->last_error
-	$s = $db->last_query
-	$s = $db->prefix
-	*/
+
+	/**
+	 * model object constructor
+	 * @param string $modelName
+	 * @param Controller $controller
+	 */
 	function __construct(string $modelName, $controller) {
 		global $wpdb;
 		$this->modelName = $modelName;
@@ -22,14 +23,28 @@ class Model {
 	}
 }
 
+/**
+ * viewer root class, minden cviewer class ennekleszármazottja
+ * @author utopszkij
+*/
 class View {
 	// jQuery és angulár nélküli változat
 	protected $viewName;
 	protected $controller;
+	
+	/**
+	 * view object contructor
+	 * @param string $modelName
+	 * @param Controller $controller
+	 */
 	function __construct(string $modelName, $controller) {
 		$this->modelName = $modelName;
 		$this->controller = $controller;
 	}
+	/**
+	 * template html megjelenítése
+	 * @param string $tmplName
+	 */
 	public function display(string $tmplName) {
 		  $tmplDir = get_template_directory();
 		  $htmlName = $this->controller->ROOTURL.'/wp-content/plugins/'.AREAMANAGER.'/views/htmls/'.$tmplName.'.html';
@@ -110,19 +125,27 @@ class View {
 	}
 }
 
+/**
+ * controller root class, minden controller ennek leszármazottja
+ * @author utopszkij
+ */
 class Controller {
 	protected $controllerName;
 	protected $model = false;
 	protected $view = false;
-	function __construct(string $option) {
-		$this->controllerName = $option;
+	
+	/**
+	 * controller object constructor
+	 * @param string $option  - álltalában a controller neve
+	 */
+	function __construct(string $option = 'option') {
+	    $this->controllerName = $option;
 		$this->loggedUser = new stdClass();
 		$this->loggedUser->ID = 0;
 		$this->ROOTURL = get_site_url();
 		$this->MYURL = AREAMANAGER_PLUGINURL;
 		$this->MYPATH = AREAMANAGER_PLUGINPATH;
-		$this->LNG = new stdClass();
-		if ( is_user_logged_in() ) {
+		 if ( is_user_logged_in() ) {
 		    $this->loggedUser = wp_get_current_user();
 		    // ID, user_login, .....
 		}
@@ -135,10 +158,15 @@ class Controller {
 		foreach ($_POST as $fn => $fv) {
 			$this->$fn = $fv;
 		}
-		$this->model = $this->getModel($this->controllerName);
+	    $this->model = $this->getModel($this->controllerName);
 		$this->view = $this->getView($this->controllerName);
 	}
 	
+	/**
+	 * model betöltése és példányosítása, ha nincs ilyen file akkor result=false
+	 * @param string $modelName
+	 * @return Model|boolean
+	 */
 	public function getModel(string $modelName) {
 		if (file_exists(AREAMANAGER_PLUGINPATH.'/models/'.$modelName.'.php')) {
 			include_once AREAMANAGER_PLUGINPATH.'/models/'.$modelName.'.php';
@@ -146,11 +174,15 @@ class Controller {
 			$result = new  $modelName ($modelName, $this);
 		} else {
 			$result = false;
-			echo 'model not found'; exit();
 		}	
 		return $result;
 	}
 
+	/**
+	 * viewer betöltése és példányosítása, ha nincs ilyen file akkor result=false
+	 * @param string $viewName
+	 * @return View|boolean
+	 */   
 	public function getView(string $viewName) {
 		if (file_exists(AREAMANAGER_PLUGINPATH.'/views/'.$viewName.'.php')) {
 			include_once AREAMANAGER_PLUGINPATH.'/views/'.$viewName.'.php';
@@ -158,7 +190,6 @@ class Controller {
 			$result = new  $viewName ($viewName, $this);
 		} else {
 			$result = false;
-			echo 'view not found'; exit();
 		}	
 		return $result;
 	}
@@ -214,15 +245,15 @@ class Controller {
 	}
 	
 	/**
-	* adat olvasás a config -ból
+	* adat olvasás a wp config -ból
 	* @param string $name
 	* @result string
 	*/
 	public function getOption(string $name) {
 		return get_option($name, '');
-   }
+    }
 
-}
+} // Controller
 
 /**
 * szöveg formázó
@@ -239,5 +270,6 @@ function txt(string $format, $vars): string {
 	}
 	return $result;
 }
+
 
 ?>

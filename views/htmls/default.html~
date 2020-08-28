@@ -1,5 +1,0 @@
-<h2>{{title}}</h2>
-<p>MYURL={{MYURL}}</p>
-<p ng-repeat="row in w">
-  {{row}}
-</p>
