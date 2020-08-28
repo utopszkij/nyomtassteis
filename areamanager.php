@@ -38,7 +38,7 @@ class Areamanager {
 	  }
 	}  
 	  
-	public function rooter(string $defOption='default', string $defTask='default') {
+	public function rooter(string $defOption='default', string $defTask='default', array $params = [] ) {
     	ob_start(); // echo és html output átirányitása memóra pufferbe
     	// saját css és betöltése
     	?>
@@ -79,7 +79,7 @@ class Areamanager {
     			if (isset($_GET['task'])) {
     				$task = $_GET['task'];
     			}		
-    			$controller->$task ();
+    			$controller->$task ($params);
     	 } else {
     			echo 'controller not found '.AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php'; exit();	 
     	 }
@@ -146,8 +146,8 @@ function areamanagerClearTitle() {
 /**
 * wordpress esemény kezelő, a content megjelenités után fut le
 * amit ez visszaad az a content szövege után jelenik meg.
-* Ez a plugin front end fő programja
-* az  index.php/areamanager?option=controllername&task=taskName  szerű hivásokat kezeli
+* Ez a plugin a front end fő programja
+* az  index.php/areamanager?option=controllerName&task=taskName  szerű hivásokat kezeli
 */
 add_action( 'the_content', 'areamanager_main');
 function areamanager_main(string $content): string {
@@ -162,37 +162,25 @@ function areamanager_main(string $content): string {
 
 // esemény kezelő after product save, ez fut lomtárba helyezés után is, lomtárból végleges törlésnél viszont nem.
 add_action( 'save_post_product', 'areamanager_save_post_fun', 50, 3);
-function areamanager_save_post_fun($product_id,$product,$update) {
-	if ($update) {
-		// rekord már tárolva az adatbázisba, van ID -je is
-		?>
-			<h2>Most jelenik meg a google map térkép a rajta lévő szerkeszthető sokszöggel és kereső mezővel</h2>
-			<p>product_id= <?php echo $product_id; ?></p>
-			<p>Ellenörizni: csak bejelentkezett admin használhatja!</p>
-			<p>Vizsgálni kell a product ACF "is_area" értékét, ha ez false akkor nem kell csinálni semmit.</p>
-			<p></p>			
-			<p>a sokszög kialakítása után a "Rendben" vagy a "Mégsem" gombra kell /lehet kattintani.</p>
-			<p>"Rendben" esetén tárol, Mindkét esetben visszatérünk a product editor képernyőre.</p>
-			<a href="<?php echo get_site_url(); ?>/wp-admin/post.php?post=<?php echo $product_id; ?>&action=edit">Rendben</a>
-			&nbsp;
-			<a href="<?php echo get_site_url(); ?>/wp-admin/post.php?post=<?php echo $product_id; ?>&action=edit">Mégsem</a>
-		<?php
-		exit();
-	}
+/**
+ * product after save esemény kezelő
+ * @param int $product_id
+ * @param Product $product
+ * @param bool $update
+ */
+function areamanager_save_post_fun(int $product_id,$product, bool $update) {
+    global $areamanager;
+    if ($update) {
+        echo $areamanager->rooter('product','afterSave',[$product_id, $product]);
+        exit();  // itt a woocoommerce redirectelne a product edit oldalra, ez most nem kell.
+    }
 }
 
 // lomtárból végeles törlésnél ez fut
 add_action( 'before_delete_post', 'areamanager_delete_post_fun',50,1);
 function areamanager_delete_post_fun($product_id) {
-		?>
-			<p>product_id= <?php echo $product_id; ?></p>
-			<p>Vizsgálni kell a product ACF "is_area" értékét, ha ez false akkor nem kell csinálni semmit.</p>
-			<p>Ellenörizni: csak bejelentkezett admin használhatja!</p>
-			<p>Most a program törli az adatbázisból a körvonal adatait,</p>
-			Képernyő nem jelenik meg, a művelet elvégzése után visszatérünk a termék editor oldalára.
-			<a href="<?php echo get_site_url(); ?>'/wp-admin/post.php?post='.$product_id.'&action=edit">Tovább</a>
-		<?php
-		exit();
+    global $areamanager;
+    echo $areamanager->rooter('product','afterDelete',[$product_id]);
 }
 
 ?>

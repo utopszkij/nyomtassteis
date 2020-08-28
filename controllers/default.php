@@ -1,6 +1,6 @@
 <?php
 class DefaultController extends Controller {
-	public function default() {
+	public function default(array $params = []) {
 		$this->LNG->token1 = 'szöveg1';
 		$this->title = __('teszt_plugin_title.',AREAMANAGER);
 	 	$this->w = $this->model->getItems();
