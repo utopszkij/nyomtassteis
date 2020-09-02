@@ -23,6 +23,35 @@ add_action('edited_product_cat', 'areamanager_save_meta', 10, 1);
 add_action('create_product_cat', 'areamanager_save_meta', 10, 1);
 
 /**
+ * wordpress inditó page létrehozása. Az ilyen oldalak index.php/name módon elindíthatóak.
+ * rendszerint esemény kezelő van hozzájuk kapcsolva ami egy plugin rutint indit.
+ * @param string $name
+ */
+public function areaManagerCreatePage(string $name) {
+    global $wpdb;
+    $w = get_posts( array(
+        'name' => $name,
+        'post_type' => 'page',
+        'post_status' => 'publish',
+        'posts_per_page' => 1
+    )); 
+    if (count($w) == 0) {
+        $PageGuid = site_url() ."/".$name;
+        $my_post  = array( 'post_title'     => $name.' start page',
+            'post_type'      => 'page',
+            'post_name'      => $name,
+            'post_content'   => '',
+            'post_status'    => 'publish',
+            'comment_status' => 'closed',
+            'ping_status'    => 'closed',
+            'post_author'    => 1,
+            'menu_order'     => 0,
+            'guid'           => $PageGuid );
+        wp_insert_post( $my_post );
+    }
+}  
+
+/**
  * extend woocommerce category form
  * @param Term | boolean $term
  */
