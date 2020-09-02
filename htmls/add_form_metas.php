@@ -55,6 +55,6 @@
         <button type="button" onclick="console.log(poligonMap.getPath().length)">poligon info</button>
 	</div>
 	</div>
-   <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $gAPIkey; ?>&callback=initMap&libraries=&v=weekly"></script>
+   <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $gApikey; ?>&callback=initMap&libraries=&v=weekly"></script>
    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
    <script src="<?php echo get_site_url();?>/wp-content/plugins/areamanager/js/areamanager.js"></script>

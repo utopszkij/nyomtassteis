@@ -27,6 +27,9 @@ function load_plugin_textdomain(string $domain, bool $par, string $path) {}
 function wp_enqueue_style(string $type, string $url) {}
 function add_action(string $hook, string $funName, int $prior, int $parnum) {}
 function get_template_directory(): string {return '/tmpldir';}
+function get_posts($params) {return [];}
+function wp_insert_post($params) {};
+
 /**
  * @return string
  */

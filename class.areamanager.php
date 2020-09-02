@@ -4,7 +4,7 @@
 	*/
     include_once __DIR__.'/model.php';
 	class Area extends AreaModel {
-		protected $googleApyKey = '';
+	    protected $googleApyKey = '';
 		
 		// php object constructor
 		function __construct() {
@@ -14,10 +14,6 @@
 		// php object destructor
 		function __desruct() {
 		    $this->kill();
-		}
-		
-		// main object constructor
-		public function create() {
 		}
 		
 		// insert, modify, remove implemented in model.php

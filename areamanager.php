@@ -9,47 +9,65 @@
 */
 
 define('AREAMANAGER','areamanager');
+global $gApiKey;
+$gApiKey = 'AIzaSyB1';
+$gApiKey .= 'Z88sYk5uoljvlV';
+$gApiKey .= 'haLxt_TbS9MKDiDYA';
 
-// init plugin, load languages definiton, style, javascripts
+/**
+ * create AreaManager starting page if not exists
+ * start plugin:   <myDomain>/index.php/areamanager
+ * @var unknown $w
+ */
+$w = get_posts( array(
+    'name' => $name,
+    'post_type' => 'page',
+    'post_status' => 'publish',
+    'posts_per_page' => 1
+));
+if (count($w) == 0) {
+    $PageGuid = site_url() ."/".$name;
+    $my_post  = array( 'post_title'     => $name.' start page',
+        'post_type'      => 'page',
+        'post_name'      => $name,
+        'post_content'   => '',
+        'post_status'    => 'publish',
+        'comment_status' => 'closed',
+        'ping_status'    => 'closed',
+        'post_author'    => 1,
+        'menu_order'     => 0,
+        'guid'           => $PageGuid );
+    wp_insert_post( $my_post );
+}
+
+/**
+ * init plugin, load languages definiton, style
+ */ 
+add_action('init','areamanager_plugin_init');
 function areamanager_plugin_init(){
     load_plugin_textdomain(AREAMANAGER, false, AREAMANAGER.'/languages');
     wp_enqueue_style( 'style', get_site_url().'/wp-content/plugins/areamanager/css/areamanager.css');
 }
-add_action('init','areamanager_plugin_init');
+
+/**
+ * Areamanager frontend main page
+ * url: <mainUrl>/index.php/areamanager
+ */
+add_action( 'the_content', 'areamanager_main');
+function areamanager_main(string $content): string {
+    global $post;
+    if ($post->post_name == AREAMANAGER) {
+            // plugin main inditása $content törlése
+            $content = 'Area manager program main page';
+    }
+    return $content;
+}
+
 add_action('admin_init','areamanager_plugin_init');
 add_action('product_cat_add_form_fields', 'areamanager_extend_form', 10, 0);
 add_action('product_cat_edit_form_fields', 'areamanager_extend_form', 10, 1);
 add_action('edited_product_cat', 'areamanager_save_meta', 10, 1);
 add_action('create_product_cat', 'areamanager_save_meta', 10, 1);
-
-/**
- * wordpress inditó page létrehozása. Az ilyen oldalak index.php/name módon elindíthatóak.
- * rendszerint esemény kezelő van hozzájuk kapcsolva ami egy plugin rutint indit.
- * @param string $name
- */
-public function areaManagerCreatePage(string $name) {
-    global $wpdb;
-    $w = get_posts( array(
-        'name' => $name,
-        'post_type' => 'page',
-        'post_status' => 'publish',
-        'posts_per_page' => 1
-    )); 
-    if (count($w) == 0) {
-        $PageGuid = site_url() ."/".$name;
-        $my_post  = array( 'post_title'     => $name.' start page',
-            'post_type'      => 'page',
-            'post_name'      => $name,
-            'post_content'   => '',
-            'post_status'    => 'publish',
-            'comment_status' => 'closed',
-            'ping_status'    => 'closed',
-            'post_author'    => 1,
-            'menu_order'     => 0,
-            'guid'           => $PageGuid );
-        wp_insert_post( $my_post );
-    }
-}  
 
 /**
  * extend woocommerce category form
