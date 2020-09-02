@@ -1,187 +1,132 @@
 <?php
 /**
- * Plugin Name: AreaManager WordPress bővítmény
- * Plugin URI: http://github.com/utopszkij/areamanager
- * Description: Ez kiegészítés a wordpress / woocomerce eb áruházhoz. Google map -on megjeleníthető szinezett terület rendelhető a termékekhez.
- * Author: Fogler Tibor, Sas Tibor
- * Version: 1.0
- * Author URI: http://github.com/utopszkij/
- * Domain Path: /areamanager/areamanager
- * Text Domain: areamanager
+* Plugin Name: Areamanager Plugin
+* Plugin URI: http://www.github.com/utopszkij/aeramanager
+* Description: Kiegészítés woocommerce -hez, a termék kategóriákhoz terület jellemzők adhatóak
+* Version: 1.0
+* Author: Fogler Tibpre
+* Author URI: http://www.github.com/utopszkij
 */
-define('AREAMANAGER', 'areamanager' );
-define('AREAMANAGER_PLUGINPATH',__DIR__);
-define('AREAMANAGER_PLUGINURL',get_site_url().'index.php/areamanager'); 
 
-class Areamanager {
-	/**
-	* wordpress inditó page létrehozása. Az ilyen oldalak index.php/name módon elindíthatóak.
-	* rendszerint esemény kezelő van hozzájuk kapcsolva ami egy plugin rutint indit.
-	* @param string $name
-	*/
-	public function areaManagerCreatePage(string $name) {
-		global $wpdb;
-	   $w = $wpdb->get_results('select * from '.$wpdb->prefix.'posts where post_type="page" and post_name="'.$name.'"');
-	   if (count($w) == 0) {
-			$PageGuid = site_url() ."/".$name;
-			$my_post  = array( 'post_title'     => $name.' start page',
-		                   'post_type'      => 'page',
-		                   'post_name'      => $name,
-		                   'post_content'   => '',
-		                   'post_status'    => 'publish',
-		                   'comment_status' => 'closed',
-		                   'ping_status'    => 'closed',
-		                   'post_author'    => 1,
-		                   'menu_order'     => 0,
-		                   'guid'           => $PageGuid );
-		  wp_insert_post( $my_post );
-	  }
-	}  
-	  
-	public function rooter(string $defOption='default', string $defTask='default', array $params = [] ) {
-    	ob_start(); // echo és html output átirányitása memóra pufferbe
-    	// saját css és betöltése
-    	?>
-        <link rel='stylesheet' 
-       	href="<?php echo get_site_url(); ?>/wp-content/plugins/areamanager/css/areamanager.css" />	
-    	<?php
-    	
-    	// bejelentkezett user elérése
-    	$current_user = new stdClass();	
-    	if ( is_user_logged_in() ) {
-    	    // Current user is logged in,
-    	    // so let's get current user info
-    	    $current_user = wp_get_current_user();
-    	    // User ID
-    	    $user_id = $current_user->ID;
-    	 }
-    	 
-    	 // option és task GET/POST paraméter kezelése
-    	 if (isset($_POST['option'])) {
-    		$_GET['option'] = $_POST['option'];	 
-    	 }
-    	 if (isset($_POST['task'])) {
-    		$_GET['task'] = $_POST['task'];	 
-    	 }
-    	 $option = $defOption;
-    	 if (isset($_GET['option'])) {
-    		$option = $_GET['option'];
-    	 }	
-    	 
-    	 // controller betöltése, aktivizálása
-    	 if (file_exists(AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php')) {
-    			include_once(AREAMANAGER_PLUGINPATH.'/fw.php');
-    			include_once(AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php');
-    			$controllerName = ucFirst($option).'Controller';
-    			$controller = new $controllerName ($option);
-    			$controller->currentUser = $current_user;
-    			$task = $defTask;
-    			if (isset($_GET['task'])) {
-    				$task = $_GET['task'];
-    			}		
-    			$controller->$task ($params);
-    	 } else {
-    			echo 'controller not found '.AREAMANAGER_PLUGINPATH.'/controllers/'.$option.'.php'; exit();	 
-    	 }
-    	 $result = ob_get_contents(); // echo -zott tartalom kinyerése a $result változóba
-    	 ob_end_clean();
-    	 return $result;
-	 }
-	 
-} // Areamanager class
-global $areamanager;
+define('AREAMANAGER','areamanager');
 
-// init plugin
+// init plugin, load languages definiton, style, javascripts
 function areamanager_plugin_init(){
-	global $areamanager;
-    $areamanager = new Areamanager();
-    if( !session_id() )
-        session_start();
-    $areamanager->areaManagerCreatePage(AREAMANAGER);  
-    load_plugin_textdomain( AREAMANAGER, false, AREAMANAGER.'/languages' );
+    load_plugin_textdomain(AREAMANAGER, false, AREAMANAGER.'/languages');
+    wp_enqueue_style( 'style', get_site_url().'/wp-content/plugins/areamanager/css/areamanager.css');
 }
 add_action('init','areamanager_plugin_init');
-
-// ========================== admin oldal ============================================================== 
-
-/**
-* ez a plugin admin oldali fő programja,
-* beépítve az admin oldal Beállítások menü alá
-*/ 
-function areamanager_admin() {
-    global $areamanager;
-    echo $areamanager->rooter('admin','adminPanel');
-}
-function areamanager_plugin_create_menu() {
- add_options_page("AreaManager WordPress bővítmény", "Area Manager WordPress bővítmény", 1, 
- 	AREAMANAGER, "areamanager_admin");
-}
-add_action('admin_menu', 'areamanager_plugin_create_menu');
-
-
-// ========================== site ======================================================================
+add_action('admin_init','areamanager_plugin_init');
+add_action('product_cat_add_form_fields', 'areamanager_extend_form', 10, 0);
+add_action('product_cat_edit_form_fields', 'areamanager_extend_form', 10, 1);
+add_action('edited_product_cat', 'areamanager_save_meta', 10, 1);
+add_action('create_product_cat', 'areamanager_save_meta', 10, 1);
 
 /**
-* wordpress default esemény kezelő, minden frontend html megjelenítéskor fut
-* global $post már fel van töltve, de még nem lett megjelenítve. 
-* Amikor index.php/areamanager URL -el jelenítjuk meg a plugin indító oldalát, 
-* akkor jobb lenne ha a title és a content üres lenne.
-* Ugyanakkor az admin oldali oldal kezelőben zavaró ha a titke üres.
-* Ezért az adatbázisban az oldalnak van title adata, de azt nem jelenítjük meg.
-*/
-add_action( 'wp', 'areamanagerClearTitle' );
-function areamanagerClearTitle() {
-	global $post;
-    if ('page' === get_post_type()) {
-    	if ($post->post_name == AREAMANAGER) {
-			$post->post_title = '';
-			$post->content = '';
-    	}
-    } else {
-			return '';    
-    }
-}
-
-
-/**
-* wordpress esemény kezelő, a content megjelenités után fut le
-* amit ez visszaad az a content szövege után jelenik meg.
-* Ez a plugin a front end fő programja
-* az  index.php/areamanager?option=controllerName&task=taskName  szerű hivásokat kezeli
-*/
-add_action( 'the_content', 'areamanager_main');
-function areamanager_main(string $content): string {
-    global $areamanager, $post;
-	if ($post->post_name == AREAMANAGER) {
-	    $result =  $areamanager->rooter('default','default');
-	} else {
-	    $result = $content;
-	}
-	return $result;   
-}
-
-// esemény kezelő after product save, ez fut lomtárba helyezés után is, lomtárból végleges törlésnél viszont nem.
-add_action( 'save_post_product', 'areamanager_save_post_fun', 50, 3);
-/**
- * product after save esemény kezelő
- * @param int $product_id
- * @param Product $product
- * @param bool $update
+ * extend woocommerce category form
+ * @param Term | boolean $term
  */
-function areamanager_save_post_fun(int $product_id,$product, bool $update) {
-    global $areamanager;
-    if ($update) {
-        echo $areamanager->rooter('product','afterSave',[$product_id, $product]);
-        exit();  // itt a woocoommerce redirectelne a product edit oldalra, ez most nem kell.
+function areamanager_extend_form($term = false) {
+    if ($term) {
+        $term_id = $term->term_id;
+        // retrieve the existing value(s) for this meta field.
+        $type = get_term_meta($term_id, 'type', true);
+        $enable_start = get_term_meta($term_id, 'enable_start', true);
+        $enable_end = get_term_meta($term_id, 'enable_end', true);
+        $central = get_term_meta($term_id, 'central', true);
+        $poligon = get_term_meta($term_id, 'poligon', true);
+        $population = get_term_meta($term_id, 'population', true);
+        $place = get_term_meta($term_id, 'place', true);
+    } else {
+        $type = 'continent';
+        $enable_start = '';
+        $enable_end = '';
+        $central = '';
+        $poligon = '';
+        $population = 0;
+        $place = 0;
     }
-}
+    ?>
+    <div id="areamanager-category-extend">
+    <div class="form-field form-type-wrap">
+        <label><?php echo __('category_type',AREAMANAGER); ?></label>
+        <select id="type" name="type">
+        	<option value="continent"<?php if ($type == 'continent') echo ' selected="selected"'; ?>>
+        		<?php echo __('continent',AREAMANAGER); ?></option>
+        	<option value="country"<?php if ($type == 'country') echo ' selected="selected"'; ?>>
+        		<?php echo __('country',AREAMANAGER); ?></option>
+        	<option value="region_1"<?php if ($type == 'region_1') echo ' selected="selected"'; ?>>
+        		<?php echo __('region_1',AREAMANAGER); ?></option>
+        	<option value="region_2"<?php if ($type == 'region_2') echo ' selected="selected"'; ?>>
+        		<?php echo __('region_2',AREAMANAGER); ?></option>
+        	<option value="locality"<?php if ($type == 'locality') echo ' selected="selected"'; ?>>
+        		<?php echo __('locality',AREAMANAGER); ?></option>
+        	<option value="sublocality"<?php if ($type == 'sublocality') echo ' selected="selected"'; ?>>
+        		<?php echo __('sublocality',AREAMANAGER); ?></option>
+        	<option value="postalcode"<?php if ($type == 'postalcode') echo ' selected="selected"'; ?>>
+        		<?php echo __('postalcode',AREAMANAGER); ?></option>
+        	<option value="local_pol_zone"<?php if ($type == 'local_pol_zone') echo ' selected="selected"'; ?>>
+        		<?php echo __('local_pol_zone',AREAMANAGER); ?></option>
+        	<option value="country_pol_zone"<?php if ($type == 'county_pol_zone') echo ' selected="selected"'; ?>>
+        		<?php echo __('country_pol_zone',AREAMANAGER); ?></option>
+        </select>
+    </div>
+    <div class="form-field form-enable_start-wrap">
+        <label><?php echo __('enable_start',AREAMANAGER); ?></label>
+        <input type="text" id="enable_start" name="enable_start" value="<?php  echo $enable_start; ?>" />
+	</div>
+    <div class="form-field form-enable_end-wrap">
+        <label><?php echo __('enable_end',AREAMANAGER); ?></label>
+        <input type="text" id="enable_end" name="enable_end" value="<?php  echo $enable_end; ?>" />
+	</div>
+    <div class="form-field form-central-wrap">
+        <label><?php echo __('central',AREAMANAGER); ?></label>
+        <input type="text" id="central" name="central" value="<?php  echo $central; ?>" onchange="centralChange()" />
+	</div>
+    <div class="form-field form-population-wrap">
+        <label><?php echo __('population',AREAMANAGER); ?></label>
+        <input type="text" id="population" name="population" value="<?php  echo $population; ?>" />
+	</div>
+    <div class="form-field form-place-wrap">
+        <label><?php echo __('place',AREAMANAGER); ?>&nbsp;&nbsp;&nbsp;</label>
+        <input type="text" id="place" name="place" value="<?php  echo $place; ?>" />
+	</div>
+    <div class="form-field form-poligon-wrap">
+        <label><?php echo __('poligon',AREAMANAGER); ?></label>
+        <textarea row="20" cols="80" id="poligon" name="poligon"><?php echo $poligon; ?></textarea>
+	</div>
+    <div class="form-field form-map-wrap">
+        <div id="map" style="width:520px; height:450px"></div>
+	</div>
+    <div class="form-field form-button-wrap">
+        <button type="button" onclick="console.log(poligonMap.getPath().length)">poligon info</button>
+	</div>
+	</div>
+   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1Z88sYk5uoljvlVhaLxt_TbS9MKDiDYA&callback=initMap&libraries=&v=weekly"></script>
+   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+   <script src="<?php echo get_site_url();?>/wp-content/plugins/areamanager/js/areamanager.js"></script>
+	<?php
+}	
 
-// lomtárból végeles törlésnél ez fut
-add_action( 'before_delete_post', 'areamanager_delete_post_fun',50,1);
-function areamanager_delete_post_fun($product_id) {
-    global $areamanager;
-    echo $areamanager->rooter('product','afterDelete',[$product_id]);
+/**
+ * extend wooCommerce category save to database
+ * @param int $term_id
+ */
+function areamanager_save_meta($term_id) {
+    $type = filter_input(INPUT_POST, 'type');
+    $enable_start = filter_input(INPUT_POST, 'enable_start');
+    $enable_end = filter_input(INPUT_POST, 'enable_end');
+    $central = filter_input(INPUT_POST, 'central');
+    $poligon = filter_input(INPUT_POST, 'poligon');
+    $population = filter_input(INPUT_POST, 'population');
+    $place = filter_input(INPUT_POST, 'place');
+    update_term_meta($term_id, 'type', $type);
+    update_term_meta($term_id, 'enable_start', $enable_start);
+    update_term_meta($term_id, 'enable_end', $enable_end);
+    update_term_meta($term_id, 'central', $central);
+    update_term_meta($term_id, 'poligon', $poligon);
+    update_term_meta($term_id, 'population', $population);
+    update_term_meta($term_id, 'place', $place);
 }
 
 ?>
-

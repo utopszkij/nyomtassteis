@@ -37,7 +37,7 @@ Result Json string:
 
 ## Telepítés
 
-Szükséges: wordpress (admin jog), AdvancedCustomField plugin, php, mysql 
+Szükséges: wordpress 4.4+ (admin jog), AdvancedCustomField plugin, php, mysql 
 
  1. Hozz létre egy **areamanager** nevü könyvtárat a wordpress "wp-content/plugins" könytárában.
  2. Másold ebbe be ennek a könyvtárnak a teljes tartalmát
@@ -45,6 +45,9 @@ Szükséges: wordpress (admin jog), AdvancedCustomField plugin, php, mysql
  4. A wordpress adminisztrátori oldalon kapcsold be a plugint.
  5. Az admin panel beállítások részében nyissuk meg a plugin beállító paneljét és adjuk meg a kért adatokat.
  
+
+ Szükség van google API_key -re
+ lásd: https://developers.google.com/maps/documentation/javascript/get-api-key
 
 ## Licensz
 
