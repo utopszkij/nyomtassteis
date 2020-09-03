@@ -29,6 +29,8 @@ function add_action(string $hook, string $funName, int $prior, int $parnum) {}
 function get_template_directory(): string {return '/tmpldir';}
 function get_posts($params) {return [];}
 function wp_insert_post($params) {};
+function update_option(string $name, string $value) {}
+function get_option(string $name, $param=null): string {return 'option_'.$name;}
 
 /**
  * @return string
@@ -196,11 +198,13 @@ function wp_update_term( int $term_id, string $taxanomia, array $params = []) {
 function update_term_meta(int $term_id, string $name, $value):bool {
     global $database;
     $result = false;
+    $i = 0;
     foreach ($database->termmeta as $termmeta) {
         if (($termmeta->term_id == $term_id) & ($termmeta->name == $name)) {
-            $termmeta->$name = $value;
+            $database->termmeta[$i]->value = $value;
             $result = true;
         }
+        $i++;
     }
     if (!$result) {
 		$result = add_term_meta($term_id, $name, $value);

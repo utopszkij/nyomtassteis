@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-09-01 18:44+0200\n"
-"PO-Revision-Date: 2020-09-01 18:44+0200\n"
+"POT-Creation-Date: 2020-09-03 09:09+0200\n"
+"PO-Revision-Date: 2020-09-03 09:11+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: hu_HU\n"
@@ -14,70 +14,111 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: areamanager.php\n"
+"X-Poedit-SearchPath-1: htmls\n"
 
-#: areamanager.php:52
+#: htmls/add_form_metas.php:3
 msgid "category_type"
 msgstr "Terület tipus"
 
-#: areamanager.php:55
+#: htmls/add_form_metas.php:6
+msgid "notarea"
+msgstr "Nem terület"
+
+#: htmls/add_form_metas.php:8
 msgid "continent"
 msgstr "Kontinens"
 
-#: areamanager.php:57
+#: htmls/add_form_metas.php:10
 msgid "country"
 msgstr "ország"
 
-#: areamanager.php:59
+#: htmls/add_form_metas.php:12
 msgid "region_1"
 msgstr "megye"
 
-#: areamanager.php:61
+#: htmls/add_form_metas.php:14
 msgid "region_2"
 msgstr "járás"
 
-#: areamanager.php:63
+#: htmls/add_form_metas.php:16
 msgid "locality"
 msgstr "település"
 
-#: areamanager.php:65
+#: htmls/add_form_metas.php:18
 msgid "sublocality"
 msgstr "kerület"
 
-#: areamanager.php:67
+#: htmls/add_form_metas.php:20
 msgid "postalcode"
 msgstr "irányítószám"
 
-#: areamanager.php:69
+#: htmls/add_form_metas.php:22
 msgid "local_pol_zone"
 msgstr "önkormányzati vk."
 
-#: areamanager.php:71
+#: htmls/add_form_metas.php:24
 msgid "country_pol_zone"
 msgstr "oevk"
 
-#: areamanager.php:75
+#: htmls/add_form_metas.php:30
 msgid "enable_start"
 msgstr "érvényesség kezdete"
 
-#: areamanager.php:79
+#: htmls/add_form_metas.php:34
 msgid "enable_end"
 msgstr "érvényesség vége"
 
-#: areamanager.php:83
+#: htmls/add_form_metas.php:38
 msgid "central"
 msgstr "közelítő középpont címe (pl. Veszrém Magyarország)"
 
-#: areamanager.php:87
+#: htmls/add_form_metas.php:42
 msgid "population"
 msgstr "lélekszám"
 
-#: areamanager.php:91
+#: htmls/add_form_metas.php:46
 msgid "place"
 msgstr "terület"
 
-#: areamanager.php:95
+#: htmls/add_form_metas.php:50
 msgid "poligon"
 msgstr "körvonal pontok"
+
+#: htmls/add_form_metas.php:58
+msgid "del_poligon"
+msgstr "Körvonal törlése\t"
+
+#: htmls/adminform.php:3
+msgid "Extend area manager capacity into wooCoomerce category"
+msgstr "woocommerce termék kategóriák bővítése terület adatokkal"
+
+#: htmls/adminform.php:4
+msgid "Author"
+msgstr "Szerző"
+
+#: htmls/adminform.php:7
+msgid "Setup"
+msgstr "beállítás"
+
+#: htmls/adminform.php:11
+msgid "google_api_key"
+msgstr "google API kulcs"
+
+#: htmls/adminform.php:21
+msgid "save"
+msgstr "tárolás"
+
+#: htmls/adminform.php:24
+msgid "cancel"
+msgstr "mégsem"
+
+#: htmls/adminform.php:31
+msgid "create_areas"
+msgstr "területek létrehozása"
+
+#: htmls/adminform.php:34
+msgid "delete_areas"
+msgstr "területek törlése"
 
 #~ msgid "acces_violation"
 #~ msgstr "hozzáférés megtagadva"
@@ -90,30 +131,6 @@ msgstr "körvonal pontok"
 
 #~ msgid "delete"
 #~ msgstr "törlés"
-
-#~ msgid "cancel"
-#~ msgstr "mégsem"
-
-#~ msgid "Extend area manager capacity into wooCoomerce category"
-#~ msgstr "woocommerce termék kategóriák bővítése terület adatokkal"
-
-#~ msgid "Author"
-#~ msgstr "Szerző"
-
-#~ msgid "Setup"
-#~ msgstr "beállítás"
-
-#~ msgid "google_api_key"
-#~ msgstr "google API kulcs"
-
-#~ msgid "save"
-#~ msgstr "tárolás"
-
-#~ msgid "create_areas"
-#~ msgstr "területek létrehozása"
-
-#~ msgid "delete_areas"
-#~ msgstr "területek törlése"
 
 #~ msgid "valami"
 #~ msgstr "valami Fajta szöveg"

@@ -4,8 +4,8 @@
 	*/
     include_once __DIR__.'/model.php';
 	class Area extends AreaModel {
-	    protected $googleApyKey = '';
-		
+	    public $gApiKey;
+	    
 		// php object constructor
 		function __construct() {
 		    $this->create();
@@ -14,6 +14,11 @@
 		// php object destructor
 		function __desruct() {
 		    $this->kill();
+		}
+		
+		// main constructor
+		public function create() {
+		    $this->gApiKey = get_option('areamanager_gApiKey', null);
 		}
 		
 		// insert, modify, remove implemented in model.php
@@ -100,6 +105,31 @@
 		    }
 		}
 		
+		/**
+		 * echo admin form
+		 */
+		public function adminPanel() {
+		    $task = filter_input(INPUT_POST, 'task');
+		    if ($task == 'setupSave') {
+		        $this->setupSave();
+		    } else {
+		      $this->display('adminform');
+		    }
+		}
+		
+		/**
+		 * process adminpanel 
+		 */
+		public function setupSave() {
+		    $this->gApiKey = filter_input(INPUT_POST, 'gApiKey');
+		    update_option('areamanager_gApiKey', $this->gApiKey);
+		    ?>
+		    <h1>AREAMANGER SETUP</h1>
+		    <div class="alert alert-succes"><?php echo __('data_saved',AREAMANAGER); ?></div>
+		    <p>google API key:<?php echo get_option('areamanager_gApiKey', null); ?></p>
+		    <?php
+		}
+		
 		// ===========================================
 		
 		/**
@@ -114,7 +144,7 @@
         /**
          * include html template
          * find first in templateDir/areamanager/htmls
-         *      second in plugindir/htmls_
+         *      second in plugindir/htmls
          * @param string $tmplName
          */
 		protected function display(string $tmplName) {
@@ -126,7 +156,5 @@
 		    }
 		    include ($path.'/'.$tmplName.'.php');
 		}
-		
-	
 	} // class
 ?>

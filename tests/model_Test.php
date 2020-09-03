@@ -58,23 +58,23 @@ class modelTest extends TestCase {
         $this->assertEquals(false,$res);
     }
     public function test_modify_ok() {
-        global $testId;
+        global $database, $testId;
         $res = $this->model->read($testId);
         if ($res) {
-            $this->model->name='test2';
-            $this->model->modify();
+            $this->model->center='center2';
+            $this->model->modify(true);
         }
         $this->assertEquals(true,$res);
         $res = $this->model->read($testId);
         $this->assertEquals(true,$res);
-        $this->assertEquals('test2',$this->model->name);
+        $this->assertEquals('center2',$this->model->center);
         $this->assertEquals('2020.01.01',$this->model->enableStart);
     }
     public function test_modify_notfound() {
         $res = $this->model->read(129);
         if ($res) {
-            $this->model->name='test2';
-            $this->model->modify();
+            $this->model->center='center2';
+            $this->model->modify(true);
         }
         $this->assertEquals(false,$res);
     }
@@ -82,20 +82,20 @@ class modelTest extends TestCase {
         global $testId;
         $res = $this->model->read(345);
         if ($res) {
-            $this->model->remove();
+            $this->model->remove(true);
         }
         $this->assertEquals(false,$res);
         // régi megmaradt?
         $res = $this->model->read($testId);
         $this->assertEquals(true,$res);
-        $this->assertEquals('test2',$this->model->name);
+        $this->assertEquals('test1',$this->model->name);
         $this->assertEquals('2020.01.01',$this->model->enableStart);
     }
     public function test_remove_ok() {
         global $testId, $database;
         $res = $this->model->read($testId);
         if ($res) {
-            $this->model->remove();
+            $this->model->remove(false);
         }
         $this->assertEquals(true,$res);
         // régi megmaradt?
