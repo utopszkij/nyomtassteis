@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-08-21 21:46+0200\n"
-"PO-Revision-Date: 2020-08-21 21:48+0200\n"
+"POT-Creation-Date: 2020-09-03 09:09+0200\n"
+"PO-Revision-Date: 2020-09-03 09:11+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: hu_HU\n"
@@ -10,15 +10,127 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.0.6\n"
-"X-Poedit-Basepath: ../../plugins/areamanager\n"
+"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: areamanager.php\n"
+"X-Poedit-SearchPath-1: htmls\n"
 
-#: teszt.php:93
-msgid "teszt_plugin_title."
-msgstr "EZ A PLUGIN CÍME."
+#: htmls/add_form_metas.php:3
+msgid "category_type"
+msgstr "Terület tipus"
 
-#: teszt.php:94
-msgid "valami"
-msgstr "valami Fajta szöveg"
+#: htmls/add_form_metas.php:6
+msgid "notarea"
+msgstr "Nem terület"
+
+#: htmls/add_form_metas.php:8
+msgid "continent"
+msgstr "Kontinens"
+
+#: htmls/add_form_metas.php:10
+msgid "country"
+msgstr "ország"
+
+#: htmls/add_form_metas.php:12
+msgid "region_1"
+msgstr "megye"
+
+#: htmls/add_form_metas.php:14
+msgid "region_2"
+msgstr "járás"
+
+#: htmls/add_form_metas.php:16
+msgid "locality"
+msgstr "település"
+
+#: htmls/add_form_metas.php:18
+msgid "sublocality"
+msgstr "kerület"
+
+#: htmls/add_form_metas.php:20
+msgid "postalcode"
+msgstr "irányítószám"
+
+#: htmls/add_form_metas.php:22
+msgid "local_pol_zone"
+msgstr "önkormányzati vk."
+
+#: htmls/add_form_metas.php:24
+msgid "country_pol_zone"
+msgstr "oevk"
+
+#: htmls/add_form_metas.php:30
+msgid "enable_start"
+msgstr "érvényesség kezdete"
+
+#: htmls/add_form_metas.php:34
+msgid "enable_end"
+msgstr "érvényesség vége"
+
+#: htmls/add_form_metas.php:38
+msgid "central"
+msgstr "közelítő középpont címe (pl. Veszrém Magyarország)"
+
+#: htmls/add_form_metas.php:42
+msgid "population"
+msgstr "lélekszám"
+
+#: htmls/add_form_metas.php:46
+msgid "place"
+msgstr "terület"
+
+#: htmls/add_form_metas.php:50
+msgid "poligon"
+msgstr "körvonal pontok"
+
+#: htmls/add_form_metas.php:58
+msgid "del_poligon"
+msgstr "Körvonal törlése\t"
+
+#: htmls/adminform.php:3
+msgid "Extend area manager capacity into wooCoomerce category"
+msgstr "woocommerce termék kategóriák bővítése terület adatokkal"
+
+#: htmls/adminform.php:4
+msgid "Author"
+msgstr "Szerző"
+
+#: htmls/adminform.php:7
+msgid "Setup"
+msgstr "beállítás"
+
+#: htmls/adminform.php:11
+msgid "google_api_key"
+msgstr "google API kulcs"
+
+#: htmls/adminform.php:21
+msgid "save"
+msgstr "tárolás"
+
+#: htmls/adminform.php:24
+msgid "cancel"
+msgstr "mégsem"
+
+#: htmls/adminform.php:31
+msgid "create_areas"
+msgstr "területek létrehozása"
+
+#: htmls/adminform.php:34
+msgid "delete_areas"
+msgstr "területek törlése"
+
+#~ msgid "acces_violation"
+#~ msgstr "hozzáférés megtagadva"
+
+#~ msgid "teszt_plugin_title."
+#~ msgstr "EZ A PLUGIN CÍME."
+
+#~ msgid "area_name"
+#~ msgstr "terület neve"
+
+#~ msgid "delete"
+#~ msgstr "törlés"
+
+#~ msgid "valami"
+#~ msgstr "valami Fajta szöveg"
