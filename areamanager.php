@@ -4,9 +4,16 @@
 * Plugin URI: http://www.github.com/utopszkij/aeramanager
 * Description: Kiegészítés woocommerce -hez, a termék kategóriákhoz terület jellemzők adhatóak
 * Version: 1.0
+* Requires at least: 4.4 
+* Requires PHP:      7.2
 * Author: Fogler Tibpre
 * Author URI: http://www.github.com/utopszkij
+* Text Domain:       areamanager
+* Domain Path:       /languages
+* License:           GPL v2 or later
+* License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 */
+
 
 define('AREAMANAGER','areamanager');
 
@@ -54,11 +61,16 @@ function areamanager_admin() {
     $area = new Area();
     $area->adminPanel();
 }
-add_action('admin_menu', 'areamanager_plugin_create_menu');
 function areamanager_plugin_create_menu() {
     add_options_page("AreaManager WordPress bővítmény", "Area Manager WordPress bővítmény", 1,
         AREAMANAGER, "areamanager_admin");
+
+    add_menu_page('Areamanager Info' ,'Areamanager setup','manage_options',
+            'areamanager-info','areamanager_admin','', 11 );
+    // add_submenu_page('areamanager-info', 'almenu-page-title', 'almenu', 'manage_options',
+    //    'almenu-slug','areamanager_admin', 1);
 }
+add_action('admin_menu', 'areamanager_plugin_create_menu');
 
 /**
  * Areamanager frontend main page

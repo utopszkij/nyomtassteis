@@ -103,7 +103,11 @@
                   editable: true
                 });
                 poligonMap.setMap(map);
+			} else {
+				drawDefPoligon();
 			}
+		} else {
+			drawDefPoligon();
 		}
 	  }	
 
@@ -126,7 +130,7 @@
 		        }); 
 	      
 			  /* adjust map center and poligon nem jó mert még nincsenek esemény kezelők
-			  if (jQuery('#poligon').val() == '[]') {
+			  if ((jQuery('#poligon').val() == '[]') | (jQuery('#poligon').val() == '')){
 				// set map position and draw default poligon from "central"|"name" value
 				console.log('def poligon');
 				jQuery('#central').change();
@@ -154,7 +158,7 @@
 				if (type == 'notarea') {
 					jQuery('#areamanagerAreaInfo').hide();
 				} else {
-					if (jQuery('#poligon').val() == '[]') {
+					if ((jQuery('#poligon').val() == '[]') | (jQuery('#poligon').val() == '')) {
 						// set map position and draw default poligon from "central"|"name" value
 						console.log('def poligon');
 						jQuery('#central').change();
@@ -200,7 +204,7 @@
 			
 			console.log('central change '+jQuery('#poligon').val());
 			
-			if (jQuery('#poligon').val() == '[]') {
+			if ((jQuery('#poligon').val() == '[]') | (jQuery('#poligon').val() == '')) {
 	    		const geocoder = new google.maps.Geocoder();
 	    		var address = jQuery('#central').val();
 	    		if (address == '') {
